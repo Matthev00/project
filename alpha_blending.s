@@ -10,11 +10,6 @@ global alpha_blending
 alpha_blending:
     push rbp
 	mov rbp, rsp
-
-	; Define variables on stack
-    ;%define image1  [rbp]
-    ;%define image2  [rbp + 4]
-    ;%define size    [rbp + 8]
     ;rdi -> 1 bitmap
     ;rsi -> 2 bitmpa
     ;rdx -> x
@@ -58,7 +53,8 @@ blend_colors:
     divss   xmm1, xmm0  ;siunus x/r
     ; xmm1<-sinus x
 
-	movss xmm1, [rdi + rax + 3] ; read alpha value of object
+;bhiuniomimoinoinminoin
+	movss xmm1, [rdi + rax + 3]
 	divss xmm1, [max]
 ;----------------blendB---------------
 	movss xmm0, [one]	;1
@@ -75,10 +71,6 @@ blend_colors:
 	;write B to image pixel
 	movss [rdi + rax], xmm2	;zapis nowgo B w rdi
 
-	movss xmm1, [rsi + rax + 3] ; read alpha value of object
-
-
-    divss xmm1, [max] ; convert alpha to [0,1] value
 
 ;----------------blendG---------------
 
@@ -100,7 +92,6 @@ blend_colors:
 
 
 	;-----R-----------------
-	inc rax
 	;-------------BlendR------------
 	movss xmm0, [one]
 	subss xmm0, xmm1
