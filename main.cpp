@@ -42,31 +42,24 @@ void mouse_click(int button, int state, int x, int y) {
         // Wywołanie funkcji alphaBlending po kliknięciu myszką
         char* image2;
         int width2, height2;
+        std::cerr << "Kliknięcie myszy: x = " << x << ", y = " << y << std::endl;
         readBMP("obiekt.bmp", image2, width2, height2);
-
-        if (!image2) {
-            std::cerr << "Error reading image." << std::endl;
-            return;
-        }
 
         alpha_blending(img1, image2, x, y, width1);
 
         delete[] image2;
 
-        glutPostRedisplay(); // Odświeżenie sceny
+        glutPostRedisplay();
     }
 }
 
 int main(int argc, char** argv) {
-    // Wczytaj obraz i wykonaj alphaBlending
-    readBMP("tło.bmp", img1, width1, height1);
-
-    if (!img1) {
-        std::cerr << "Error reading image." << std::endl;
+    if (argc<2){
+        std::cerr << "Missing arguments!" << std::endl;
         return 0;
     }
+    readBMP(argv[1], img1, width1, height1);
 
-    // Inicjalizuj okno OpenGL i wyświetl obraz
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
     glutInitWindowSize(width1, height1);
@@ -75,7 +68,6 @@ int main(int argc, char** argv) {
     glutMouseFunc(mouse_click);
     glutMainLoop();
 
-    // Zwolnij pamięć
     delete[] img1;
 
     return 0;
