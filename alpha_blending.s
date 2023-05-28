@@ -11,6 +11,10 @@ alpha_blending:
     push rbp
 	mov rbp, rsp
 
+	; Define variables on stack
+    ;%define image1  [rbp]
+    ;%define image2  [rbp + 4]
+    ;%define size    [rbp + 8]
     ;rdi -> 1 bitmap
     ;rsi -> 2 bitmpa
     ;rdx -> x
@@ -20,9 +24,9 @@ alpha_blending:
 	;initial (X,Y) position
 	mov r11, 1
 	mov r12, 1
-    mov r9, r8
-    dec r9 		; szerokość -1
+    mov r9, r8; szerokość
     imul r8, r8; wielkość
+	imul r8, 4
     mov rax, 0; licznik
 
 
@@ -54,8 +58,8 @@ blend_colors:
     divss   xmm1, xmm0  ;siunus x/r
     ; xmm1<-sinus x
 
-	;movss xmm1, [rdi + rax + 3] ; read alpha value of object
-	;divss xmm1, [max]
+	movss xmm1, [rdi + rax + 3] ; read alpha value of object
+	divss xmm1, [max]
 ;----------------blendB---------------
 	movss xmm0, [one]	;1
 	subss xmm0, xmm1 ; 1 - a
@@ -71,7 +75,13 @@ blend_colors:
 	;write B to image pixel
 	movss [rdi + rax], xmm2	;zapis nowgo B w rdi
 
+	movss xmm1, [rsi + rax + 3] ; read alpha value of object
+
+
+    divss xmm1, [max] ; convert alpha to [0,1] value
+
 ;----------------blendG---------------
+
 	movss xmm0, [one]
 	subss xmm0, xmm1
 
@@ -109,17 +119,11 @@ blend_colors:
 	;write R to image pixel
 	movss [rdi + rax+2], xmm2
 
-
-	;-------------BlendA------------
-
-	;movss [rdi + rax+3], xmm1
-
-
     add rax, 4
 	inc r11
 
 	cmp r11, r9
-	jl blend_colors
+	jle blend_colors
 
 	mov r11, 1
 	inc r12
@@ -127,7 +131,6 @@ blend_colors:
 	jmp blend_colors
 
 endl:
-	;add rbp, LOCAL_WARS_SIZE
 	mov rsp, rbp
 	pop rbp
 	ret

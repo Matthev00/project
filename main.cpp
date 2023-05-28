@@ -9,7 +9,7 @@ void readBMP(const char* filename, char* &pixels, int& width, int& height) {
     std::ifstream file(filename, std::ios::binary);
     if (!file) {
         std::cerr << "Error opening file: " << filename << std::endl;
-        return;
+        return ;
     }
 
     char header[54];
