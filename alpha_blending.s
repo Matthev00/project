@@ -1,7 +1,5 @@
 section .data
     one dd 1.0
-	max dd 255.0
-	big dd 1200.0
 
 section .text
 
@@ -16,20 +14,18 @@ alpha_blending:
     ;rdx -> x
     ;rcx -> y
     ;r8 -> IMageWidth
+	;r9 -> Size
 
 	;X, Y na (1, 1)
 	mov r11, 1
 	mov r12, 1
-    ;mov r9, r8; szerokość
-    imul r8, r8; wielkość
-	imul r8, 4
     mov rax, 0; licznik
 
 
 
 
 blend_colors:
-    cmp rax, r8 ; jesli licznik wiekszy niż wielkość koniec
+    cmp rax, r9 ; jesli licznik wiekszy niż wielkość koniec
     jge endl
 	;---------Sinus-------------------
   ;X
@@ -55,9 +51,6 @@ blend_colors:
     divss   xmm1, xmm0  ;siunus x/r
     ; xmm1<-sinus x
 
-;bhiuniomimoinoinminoin
-	;movss xmm1, [rdi + rax + 3]
-	;divss xmm1, [max]
 ;----------------blendR---------------
 	movss xmm0, [one]	;1
 	subss xmm0, xmm1 ; 1 - a
@@ -79,7 +72,7 @@ blend_colors:
 	movss xmm0, [one]
 	subss xmm0, xmm1
 	inc rax
-	cmp rax, r8 ; jesli licznik wiekszy niż wielkość koniec
+	cmp rax, r9 ; jesli licznik wiekszy niż wielkość koniec
     jge endl
 	movss xmm2, [rdi+rax] ;bajt 1 bitmapy
 	movss xmm3, [rsi+rax] ;bajt 2 bitmapy
@@ -99,7 +92,7 @@ blend_colors:
 	movss xmm0, [one]
 	subss xmm0, xmm1
 	inc rax
-	cmp rax, r8 ; jesli licznik wiekszy niż wielkość koniec
+	cmp rax, r9 ; jesli licznik wiekszy niż wielkość koniec
     jge endl
 	movss xmm2, [rdi+rax] ;bajt 1 bitmapy
 	movss xmm3, [rsi+rax] ;bajt 2 bitmapy
@@ -117,7 +110,7 @@ blend_colors:
     inc rax
 	inc r11
 
-	cmp r11, r9
+	cmp r11, r8
 	jl blend_colors
 
 	mov r11, 1

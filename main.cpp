@@ -3,14 +3,11 @@
 #include <GL/glut.h>
 
 char* img1;
+char *label1, *label2;
 int width1, height1;
 
 void readBMP(const char* filename, char* &pixels, int& width, int& height) {
     std::ifstream file(filename, std::ios::binary);
-    if (!file) {
-        std::cerr << "Error opening file: " << filename << std::endl;
-        return ;
-    }
 
     char header[54];
     file.read(header, 54);
@@ -25,9 +22,9 @@ void readBMP(const char* filename, char* &pixels, int& width, int& height) {
     //file.close();
 }
 
-extern "C" void alpha_blending(char* image1, char* image2, int x_value, int y_value,  int width1);
+extern "C" void alpha_blending(char* image1, char* image2, int x_value, int y_value,  int width, int size);
 
-void renderScene() {
+void makeWindow() {
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -37,15 +34,15 @@ void renderScene() {
     glFlush();
 }
 
-void mouse_click(int button, int state, int x, int y) {
+void mouse(int button, int state, int x, int y) {
     if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
         // Wywołanie funkcji alphaBlending po kliknięciu myszką
         char* image2;
         int width2, height2;
-        std::cerr << "Kliknięcie myszy: x = " << x << ", y = " << y << std::endl;
-        readBMP("obiekt.bmp", image2, width2, height2);
-
-        alpha_blending(img1, image2, x, y, width1);
+        std::cerr << "x = " << x << ", y = " << y << std::endl;
+        readBMP(label1, img1, width1, height1);
+        readBMP(label2, image2, width2, height2);
+        alpha_blending(img1, image2, x, y, width1, width1*height1*3);
 
         delete[] image2;
 
@@ -58,14 +55,16 @@ int main(int argc, char** argv) {
         std::cerr << "Missing arguments!" << std::endl;
         return 0;
     }
+    label1 = argv[1];
+    label2 = argv[2];
     readBMP(argv[1], img1, width1, height1);
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
     glutInitWindowSize(width1, height1);
     glutCreateWindow("Alpha Blending");
-    glutDisplayFunc(renderScene);
-    glutMouseFunc(mouse_click);
+    glutDisplayFunc(makeWindow);
+    glutMouseFunc(mouse);
     glutMainLoop();
 
     delete[] img1;
