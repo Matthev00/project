@@ -1,6 +1,7 @@
 section .data
     one dd 1.0
 	max dd 255.0
+	big dd 1200.0
 
 section .text
 
@@ -16,10 +17,10 @@ alpha_blending:
     ;rcx -> y
     ;r8 -> IMageWidth
 
-	;initial (X,Y) position
+	;X, Y na (1, 1)
 	mov r11, 1
 	mov r12, 1
-    mov r9, r8; szerokość
+    ;mov r9, r8; szerokość
     imul r8, r8; wielkość
 	imul r8, 4
     mov rax, 0; licznik
@@ -50,13 +51,14 @@ blend_colors:
 	;Xw + Yw
 	addss xmm0, xmm2
 	sqrtss  xmm0, xmm0  ;pierwiastek
+
     divss   xmm1, xmm0  ;siunus x/r
     ; xmm1<-sinus x
 
 ;bhiuniomimoinoinminoin
-	movss xmm1, [rdi + rax + 3]
-	divss xmm1, [max]
-;----------------blendB---------------
+	;movss xmm1, [rdi + rax + 3]
+	;divss xmm1, [max]
+;----------------blendR---------------
 	movss xmm0, [one]	;1
 	subss xmm0, xmm1 ; 1 - a
 
@@ -76,9 +78,11 @@ blend_colors:
 
 	movss xmm0, [one]
 	subss xmm0, xmm1
-
-	movss xmm2, [rdi+rax+1] ;bajt 1 bitmapy
-	movss xmm3, [rsi+rax+1] ;bajt 2 bitmapy
+	inc rax
+	cmp rax, r8 ; jesli licznik wiekszy niż wielkość koniec
+    jge endl
+	movss xmm2, [rdi+rax] ;bajt 1 bitmapy
+	movss xmm3, [rsi+rax] ;bajt 2 bitmapy
 
 	mulss xmm2, xmm1
 	mulss xmm3, xmm0
@@ -88,16 +92,17 @@ blend_colors:
 	;cvtss2si eax, xmm2
 
     ;write G to image pixel
-	movss [rdi + rax+1], xmm2
+	movss [rdi + rax], xmm2
 
 
-	;-----R-----------------
-	;-------------BlendR------------
+	;------------BlendB------------
 	movss xmm0, [one]
 	subss xmm0, xmm1
-
-	movss xmm2, [rdi+rax+2] ;bajt 1 bitmapy
-	movss xmm3, [rsi+rax+2] ;bajt 2 bitmapy
+	inc rax
+	cmp rax, r8 ; jesli licznik wiekszy niż wielkość koniec
+    jge endl
+	movss xmm2, [rdi+rax] ;bajt 1 bitmapy
+	movss xmm3, [rsi+rax] ;bajt 2 bitmapy
 
 
 	mulss xmm2, xmm1
@@ -105,16 +110,15 @@ blend_colors:
 
 	addss xmm2, xmm3
 
-	;cvtss2si eax, xmm2
-
 	;write R to image pixel
-	movss [rdi + rax+2], xmm2
+	movss [rdi + rax], xmm2
 
-    add rax, 4
+
+    inc rax
 	inc r11
 
 	cmp r11, r9
-	jle blend_colors
+	jl blend_colors
 
 	mov r11, 1
 	inc r12
