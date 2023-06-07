@@ -1,5 +1,11 @@
 section .data
     one dd 1.0
+	two dd 2.0
+	zero dd 0.0
+	six dd 6.0
+	onehtw dd 120.0
+	sevenF dd 5040.0
+
 
 section .text
 
@@ -38,7 +44,7 @@ blend_colors:
 	cvtsi2ss xmm3, rcx ;przenieś pozycje y_klik do float xmm3
 	;X- Xc
 	subss xmm0, xmm1    ; odelgóść na x
-    movss xmm1, xmm0    ; kopia odległości
+    ;movss xmm1, xmm0    ; kopia odległości
 	;Y-Yc
 	subss xmm2, xmm3 ; odelgóść na y
 	;power 2
@@ -48,8 +54,53 @@ blend_colors:
 	addss xmm0, xmm2
 	sqrtss  xmm0, xmm0  ;pierwiastek
 
-    divss   xmm1, xmm0  ;siunus x/r
+    ;divss   xmm1, xmm0  ;siunus x/r
+	;
+	addss 	xmm1, [one]
+	divss	xmm1, [two]
     ; xmm1<-sinus x
+	;
+	cvtsi2ss xmm2, r8
+	divss xmm0, xmm2
+
+	;---------SINUS-----------------
+	;x - x^3/6
+	;save x
+
+	movss xmm1, [zero]
+	subss xmm1, xmm0
+	mulss xmm1, xmm0
+	mulss xmm1, xmm0
+	divss xmm1, [six]
+	addss xmm1, xmm0
+
+	; x-x^3/6
+	;---------X^5----------------------
+	movss xmm2, xmm0
+
+	mulss xmm2, xmm0
+	mulss xmm2, xmm0
+	mulss xmm2, xmm0
+	mulss xmm2, xmm0
+
+	divss xmm2, [onehtw]
+
+	; x-x^3/6+x^5/120
+	addss xmm1, xmm2
+
+	movss xmm2, [zero]
+	subss xmm2, xmm0
+
+	mulss xmm2, xmm0
+	mulss xmm2, xmm0
+	mulss xmm2, xmm0
+	mulss xmm2, xmm0
+	mulss xmm2, xmm0
+	mulss xmm2, xmm0
+
+	divss xmm2, [sevenF]
+	;x-x^3/6 + x^5/120 - x^7 /
+	subss xmm1, xmm2
 
 ;----------------blendR---------------
 	movss xmm0, [one]	;1
@@ -108,6 +159,7 @@ blend_colors:
 
 
     inc rax
+	;inc rax
 	inc r11
 
 	cmp r11, r8

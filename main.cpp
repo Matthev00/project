@@ -2,7 +2,7 @@
 #include <fstream>
 #include <GL/glut.h>
 
-char* img1;
+char* img1, img;
 char *label1, *label2;
 int width1, height1;
 
@@ -42,7 +42,7 @@ void mouse(int button, int state, int x, int y) {
         std::cerr << "x = " << x << ", y = " << y << std::endl;
         readBMP(label1, img1, width1, height1);
         readBMP(label2, image2, width2, height2);
-        alpha_blending(img1, image2, x, y, width1, width1*height1*3);
+        alpha_blending(img1, image2, x, height1 - y, width1, width1*height1*3);
 
         delete[] image2;
 
